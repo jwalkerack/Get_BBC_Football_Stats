@@ -87,6 +87,7 @@ def main():
         """
         Hey Max and Lucy, I hope you had a good holiday. I made this little game for you.
         Look forward to seeing you and hearing the answers  **Uncle Jack**
+        -Use the Buttons below to Select Leagues and Months to Download the Data that will give you answers
         - Can you please tell me me who plays at **London Stadium**
         - Can you please tell me which **English Championship** Team plays at "Turf Moor".
         - Can you please tell me what the score in the  **Scottish league One** when  played **Kelty Hearts** played **Dumbarton** on  November 2024
