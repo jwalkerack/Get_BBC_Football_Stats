@@ -82,12 +82,15 @@ def main():
 
     # Title & Overview
     filteredGames = filter_past_or_current_months(GamesPlayed)
-    st.title("BBC Football Stats")
+    st.title("Football Questions")
     st.markdown(
         """
-        This app retrieves football stats for the **2024-2025** season for leagues in **England** and **Scotland**.
-        Sourced from the https://www.bbc.co.uk/sport/football. Use the workflow below to select 
-        a **leagues** and **Month/Year** then Action - Get Game Count , Process Games and Download the data. Tool can take up 180 seconds to run. JSON format used for mock API response
+        Hey Max and Lucy, I hope you had a good holiday. I made this little game for you.
+        Look forward to seeing you and hearing the answers  **Uncle Jack**
+        - Can you please tell me me who plays at **London Stadium**
+        - Can you please tell me which **English Championship** Team plays at "Turf Moor".
+        - Can you please tell me what the score in the  **Scottish league One** when  played **Kelty Hearts** played **Dumbarton** on  November 2024
+        - In August 2024, which game had the most goals in the **English Championship**
         """
     )
 

@@ -1,0 +1,2 @@
+# Exclude main.py from being tracked
+main.py
