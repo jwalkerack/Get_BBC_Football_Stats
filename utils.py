@@ -87,6 +87,7 @@ def get_managers(soup):
 #### You Could Take the Identifers
 
 def extract_key_events(soup, event_type_class):
+    import re
     """
     Args:
         soup (BeautifulSoup): The BeautifulSoup object containing the parsed HTML.
