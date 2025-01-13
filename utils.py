@@ -86,6 +86,113 @@ def get_managers(soup):
 #### So What Needs to Be Done for the Games
 #### You Could Take the Identifers
 
+def extract_key_events(soup, event_type_class):
+    """
+    Args:
+        soup (BeautifulSoup): The BeautifulSoup object containing the parsed HTML.
+        event_type_class (str): The class identifier for the event container (e.g., 'KeyEventsHome' or 'KeyEventsAway').
+
+    Returns:
+        dict: A dictionary containing the team name and a list of events with details.
+    """
+    result = {'events': []}
+
+    # Locate the main container for key events based on the event type class
+    key_events_div = soup.find('div', class_=re.compile(f".*{event_type_class}.*"))
+    if not key_events_div:
+        print(f"Key events container with class '{event_type_class}' not found.")
+        return result
+
+    # Extract the team name from the visually hidden heading
+    #team_heading = key_events_div.find('h4', class_='ssrcss-3t9f3z-Heading e10rt3ze0')
+    #if team_heading:
+        #result['team'] = team_heading.get_text(strip=True)
+    #else:
+        #print("Team name not found.")
+
+    # Find all list items representing events
+    event_items = key_events_div.find_all('li', class_=re.compile(".*StyledAction.*"))
+    for item in event_items:
+        event = {
+            'player': '',
+            'event_type': '',
+            'details': '',
+            'time': ''
+        }
+        # Extract player name from the span with role="text"
+        player_span = item.find('span', role='text')
+        if player_span:
+            # Remove any HTML comments or extra spaces
+            player_name = player_span.get_text(strip=True)
+            event['player'] = player_name
+        else:
+            print("Player name not found for an event.")
+            continue  # Skip this event if player name is missing
+
+        # Extract the visually hidden text that describes the event
+        hidden_span = item.find('span', class_='visually-hidden ssrcss-1f39n02-VisuallyHidden e16en2lz0')
+        if hidden_span:
+            hidden_text = hidden_span.get_text(separator=', ', strip=True)
+            # Determine the event type and details
+            if "Goal" in hidden_text:
+                event['event_type'] = 'Goal'
+                # Extract goal times using regex
+                goals = re.findall(r'Goal (\d+)(?: minutes(?: plus (\d+))?)?', hidden_text)
+                goal_times = []
+                for goal in goals:
+                    minute = goal[0]
+                    extra = goal[1] if goal[1] else None
+                    if extra:
+                        goal_times.append(f"{minute}' +{extra}")
+                    else:
+                        goal_times.append(f"{minute}'")
+                event['details'] = goal_times
+            elif "Red Card" in hidden_text:
+                event['event_type'] = 'Red Card'
+                # Extract the minute of the red card
+                red_card = re.search(r'Red Card (\d+) minutes', hidden_text)
+                if red_card:
+                    event['time'] = f"{red_card.group(1)}'"
+            elif "Yellow Card" in hidden_text:
+                event['event_type'] = 'Yellow Card'
+                # Extract the minute of the yellow card
+                yellow_card = re.search(r'Yellow Card (\d+) minutes', hidden_text)
+                if yellow_card:
+                    event['time'] = f"{yellow_card.group(1)}'"
+            # Add more event types as needed
+            else:
+                event['event_type'] = 'Other'
+                event['details'] = hidden_text
+        else:
+            # Fallback: Extract event details from the visible spans
+            time_spans = item.find_all('span', class_='ssrcss-1t9po6g-TextBlock e102yuqa0')
+            times = []
+            for ts in time_spans:
+                time_text = ts.get_text(strip=True)
+                # Clean the time text by removing parentheses and commas
+                time_text = re.sub(r'[(),]', '', time_text)
+                times.append(time_text)
+            event['details'] = times
+
+            # Attempt to infer event type based on presence of certain elements
+            # For example, presence of a card image can indicate a card event
+            card_img = item.find('img', alt=True)
+            if card_img:
+                alt_text = card_img.get('alt').lower()
+                if 'red card' in alt_text:
+                    event['event_type'] = 'Red Card'
+                elif 'yellow card' in alt_text:
+                    event['event_type'] = 'Yellow Card'
+                else:
+                    event['event_type'] = 'Card'
+            else:
+                event['event_type'] = 'Unknown'
+
+        result['events'].append(event)
+    return result
+
+
+
 def Process_Data(matches):
     JsonTemplate = {}
     for m in matches:
@@ -96,8 +203,8 @@ def Process_Data(matches):
             match = matchSoup[0]
             getTheFormations = get_formations(match)
             getTheManagers = get_managers(match)
-            #test
-
+            getHomeEvents =  extract_key_events(match, 'KeyEventsHome')
+            getAwayEvents = extract_key_events(match, 'KeyEventsAway')
             JsonTemplate[m] = {"played_on": get_match_played_on_date(match),
                                  "venue": get_venue(match),
                                  "attendance": get_attendance_value(match),
@@ -106,14 +213,16 @@ def Process_Data(matches):
                                      "manager" : getTheManagers[0],
                                      "name": get_the_home_team_name(match),
                                      "score": get_home_score(match),
-                                     "possession": (return_possesion(match)[0])
+                                     "possession": (return_possesion(match)[0]),
+                                     "events" : getHomeEvents['events']
                                  },
                                  "away_team": {
                                      "formation": getTheFormations[1],
                                      "manager": getTheManagers[1],
                                      "name": get_the_away_team_name(match),
                                      "score": get_away_score(match),
-                                     "possession": return_possesion(match)[1]
+                                     "possession": return_possesion(match)[1],
+                                     "events": getAwayEvents['events']
                                  }}
     return JsonTemplate
 
