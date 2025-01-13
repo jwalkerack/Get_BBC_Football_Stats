@@ -105,7 +105,7 @@ def Process_Data(matches):
                                      "manager" : getTheManagers[0],
                                      "name": get_the_home_team_name(match),
                                      "score": get_home_score(match),
-                                     "possession": (return_possesion(match)[0])
+                                     "possession": (return_possesion(match)[0])`
                                  },
                                  "away_team": {
                                      "formation": getTheFormations[1],
