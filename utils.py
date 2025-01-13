@@ -270,6 +270,7 @@ def flatten_match_data(DataDict):
     return table
 
 def extract_key_events(soup, event_type_class):
+    import re
     """
     Extracts key events from the provided BeautifulSoup object.
 
