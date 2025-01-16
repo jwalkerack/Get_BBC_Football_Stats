@@ -383,3 +383,19 @@ def extract_key_events(soup, event_type_class):
 
     return result
 
+def pass_data_to_bucket(AA,AAS,jsonFileName,jsonData):
+    import boto3
+    s3_client = boto3.client(
+    "s3",
+    region_name="us-east-1",
+    aws_access_key_id=AA,
+    aws_secret_access_key=AAS)
+    object_folder = "Raw/"
+    object_key = object_folder + jsonFileName
+    bucket_name = "datapulledraw"
+    try:
+        response = s3_client.put_object(Bucket=bucket_name,Key=object_key,Body=jsonData,ContentType="application/json")
+    except:
+        pass
+    return response
+

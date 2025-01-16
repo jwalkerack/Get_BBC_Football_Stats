@@ -5,7 +5,7 @@ from datetime import datetime
 
 from reference import leagues , GamesPlayed
 
-from utils import Generate_Soup , extract_match_identifiers1 , Process_Data , flatten_match_data ,filter_past_or_current_months
+from utils import Generate_Soup , extract_match_identifiers1 , Process_Data , flatten_match_data ,filter_past_or_current_months , pass_data_to_bucket
 
 # Example data references
 # Replace these with your actual modules or dictionaries.
@@ -13,6 +13,9 @@ from utils import Generate_Soup , extract_match_identifiers1 , Process_Data , fl
 
 # Example utility functions
 # Replace these with your actual functions from utils.py, etc.
+import streamlit as st
+
+
 
 
 
@@ -194,7 +197,7 @@ def main():
         json_filename = f"{league_part}_{date_part}_{timestamp}_games.json"
         csv_filename = f"{league_part}_{date_part}_{timestamp}_games.csv"
 
-        colJson, colCsv = st.columns(2)
+        colJson, colCsv , colS3 = st.columns(3)
         with colJson:
             st.download_button(
                 label="Download as JSON",
@@ -209,6 +212,18 @@ def main():
                 file_name=csv_filename,
                 mime="text/csv",
             )
+        with colS3:
+            if st.button("Send data to Bucket"):
 
+                upload = pass_data_to_bucket(st.secrets["aws"]["AWS_ACCESS_KEY_ID"] , st.secrets["aws"]["AWS_SECRET_ACCESS_KEY"], json_filename, json_data)
+                if upload['ResponseMetadata']['HTTPStatusCode'] == 200:
+                    st.caption("Data Uploaded to Cloud")
+                else:
+                    st.caption("Issue")
+
+
+
+                # We'll reuse the same JSON filename, or choose a new key if you prefer
+                #upload_to_s3(json_data, bucket_name, json_filename)
 if __name__ == "__main__":
     main()
