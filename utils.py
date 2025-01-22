@@ -194,7 +194,7 @@ def extract_key_events(soup, event_type_class):
 
 
 
-def Process_Data(matches):
+def Process_Data(matches,leagueName):
     JsonTemplate = {}
     for m in matches:
         matchUrl = f"https://www.bbc.co.uk/sport/football/live/{m}#MatchStats"
@@ -208,6 +208,7 @@ def Process_Data(matches):
             getAwayEvents = extract_key_events(match, 'KeyEventsAway')
             JsonTemplate[m] = {"played_on": get_match_played_on_date(match),
                                  "venue": get_venue(match),
+                               "League_Name": leagueName,
                                  "attendance": get_attendance_value(match),
                                  "home_team": {
                                      "formation" : getTheFormations[0],

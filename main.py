@@ -52,10 +52,10 @@ def on_get_game_count(url):
     else:
         st.session_state["info_msg"] = f"Failed to retrieve data. Status: {soup_list[1]}"
 
-def on_process_games():
+def on_process_games(LeagueName):
     if st.session_state["game_count"] > 0:
         identifiers = st.session_state["identifiers"]
-        processed_data = Process_Data(identifiers)
+        processed_data = Process_Data(identifiers,LeagueName)
         st.session_state["processed_data"] = processed_data
         st.session_state["info_msg"] = "Processing complete! You can now download the data below."
     else:
@@ -163,7 +163,7 @@ def main():
             # Only enable "Process Games" if game_count > 0
             st.button(
                 "Process Games",
-                on_click=on_process_games,
+                on_click=on_process_games(league_choice),
                 disabled=(st.session_state["game_count"] == 0),
             )
 
