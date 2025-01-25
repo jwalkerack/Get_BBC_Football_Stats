@@ -1,3 +1,7 @@
+
+from player_data_model import GeneratePlayerModelCompleted
+
+
 def Generate_Soup(URL):
     import requests
     headers = {
@@ -204,8 +208,10 @@ def Process_Data(matches,leagueName):
             match = matchSoup[0]
             getTheFormations = get_formations(match)
             getTheManagers = get_managers(match)
-            getHomeEvents =  extract_key_events(match, 'KeyEventsHome')
-            getAwayEvents = extract_key_events(match, 'KeyEventsAway')
+            buildPlayerModel  = GeneratePlayerModelCompleted(match)
+            HomePlayers =  buildPlayerModel[0]
+            AwayPlayers = buildPlayerModel[1]
+            #getAwayEvents = extract_key_events(match, 'KeyEventsAway')
             JsonTemplate[m] = {"played_on": get_match_played_on_date(match),
                                  "venue": get_venue(match),
                                "League_Name": leagueName,
@@ -216,7 +222,7 @@ def Process_Data(matches,leagueName):
                                      "name": get_the_home_team_name(match),
                                      "score": get_home_score(match),
                                      "possession": (return_possesion(match)[0]),
-                                     "events" : getHomeEvents['events']
+                                     "players" : HomePlayers
                                  },
                                  "away_team": {
                                      "formation": getTheFormations[1],
@@ -224,7 +230,7 @@ def Process_Data(matches,leagueName):
                                      "name": get_the_away_team_name(match),
                                      "score": get_away_score(match),
                                      "possession": return_possesion(match)[1],
-                                     "events": getAwayEvents['events']
+                                     "players": AwayPlayers
                                  }}
     return JsonTemplate
 
