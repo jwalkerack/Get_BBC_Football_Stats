@@ -208,9 +208,14 @@ def Process_Data(matches,leagueName):
             match = matchSoup[0]
             getTheFormations = get_formations(match)
             getTheManagers = get_managers(match)
-            buildPlayerModel  = GeneratePlayerModelCompleted(match)
-            HomePlayers =  buildPlayerModel[0]
-            AwayPlayers = buildPlayerModel[1]
+            if get_home_score(match) == 'P':
+                HomePlayers = []
+                AwayPlayers = []
+            else:
+
+                buildPlayerModel  = GeneratePlayerModelCompleted(match)
+                HomePlayers =  buildPlayerModel[0]
+                AwayPlayers = buildPlayerModel[1]
             #getAwayEvents = extract_key_events(match, 'KeyEventsAway')
             JsonTemplate[m] = {"played_on": get_match_played_on_date(match),
                                  "venue": get_venue(match),
