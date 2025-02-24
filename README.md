@@ -12,8 +12,8 @@ The extracted data is **stored in JSON format** in an S3 bucket, controlled via 
 
 Directory overview
 
-LAMBDA_FUNCTION - Contains code that is uploaded to Lambda ( as well as dependancies files ) as Zip , deployment
-StepsActionByUser - Contains code that allows for testing , such as downloading current game model to file , running data floods ( all of the data to date)
+--LAMBDA_FUNCTION - Contains code that is uploaded to Lambda ( as well as dependancies files ) as Zip , deployment
+--StepsActionByUser - Contains code that allows for testing , such as downloading current game model to file , running data floods ( all of the data to date)
 
 
 
