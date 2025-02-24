@@ -12,8 +12,14 @@ The extracted data is **stored in JSON format** in an S3 bucket, controlled via 
 
 Directory overview
 
---LAMBDA_FUNCTION - Contains code that is uploaded to Lambda ( as well as dependancies files ) as Zip , deployment\n
---StepsActionByUser - Contains code that allows for testing , such as downloading current game model to file , running data floods ( all of the data to date)
+**LAMBDA_FUNCTION**
+
+Contains .py that are used to perform data extraction and data tranformation and data interactions with S3. This code as well as app.py and dependacy files are saved to deployment packagefor lambda 
+**StepsActionByUser** 
+
+Using the Scenerio_Actions.py 
+FLOOD_S3 , where data re builds can be performed ( Config , controls if this happens in DEV or Production)
+Return_One_Match_Save_To_File  saves an Game Model to file . Used for testing purposes
 
 
 
