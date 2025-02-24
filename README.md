@@ -1,6 +1,6 @@
-================================
+
 REPOSITORY OVERVIEW
-================================
+===================
 This repository is **1 of 4** in an **end-to-end data pipeline** that extracts, processes, and stores BBC data for analytical purposes.  
 
 It focuses on the **data extraction and preprocessing phase**, using:
