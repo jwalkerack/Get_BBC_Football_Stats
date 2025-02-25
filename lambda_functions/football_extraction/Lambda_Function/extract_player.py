@@ -261,6 +261,88 @@ def extract_goal_events1(soup, event_type_class):
         logging.error(f"Error in extract_goal_events: {e}", exc_info=True)
         return goals_data
 
+import re
+import logging
+from bs4 import BeautifulSoup
+
+def extract_goal_events_v2(soup, event_type_class):
+    logging.info("Entering function: extract_goal_events")
+    goals_data = {}
+
+    try:
+        key_events_div = soup.find('div', class_=re.compile(f".*{event_type_class}.*"))
+        if not key_events_div:
+            logging.warning(f"No key events found for class {event_type_class}.")
+            return goals_data
+
+        event_items = key_events_div.find_all('li', class_=re.compile(".*StyledAction.*"))
+        logging.info(f"Found {len(event_items)} event items.")
+
+        for item in event_items:
+            player_span = item.find('span', role='text')
+            extra_info_spans = item.find_all('span', class_='ssrcss-1t9po6g-TextBlock e102yuqa0')
+
+            if not player_span:
+                logging.warning("Skipping event: No player span found.")
+                continue
+
+            player_name = player_span.get_text(strip=True)
+
+            # Extract raw goal texts for each timestamp (this contains 'og' or 'pen' if present)
+            raw_goal_texts = [span.get_text(strip=True).lower() for span in extra_info_spans]
+
+            hidden_span = item.find('span', class_='visually-hidden ssrcss-1f39n02-VisuallyHidden e16en2lz0')
+
+            if hidden_span:
+                hidden_text = hidden_span.get_text(separator=', ', strip=True)
+
+                # Ignore non-goal events
+                if "Goal" not in hidden_text and "Own Goal" not in hidden_text and "Penalty" not in hidden_text:
+                    continue
+
+                # Extract goal timestamps while checking if each specific goal is a penalty or own goal
+                goal_matches = re.findall(r'(\d+)(?: minutes(?: plus (\d+))?)?', hidden_text)
+
+                goal_times = []
+                for idx, (minute, extra) in enumerate(goal_matches):
+                    goal_time = f"{minute}'"
+                    if extra:
+                        goal_time = f"{minute}'+{extra}"
+
+                    # Check if this specific goal is a penalty
+                    is_penalty = "pen" in raw_goal_texts[idx] if idx < len(raw_goal_texts) else False
+                    # Check if this specific goal is an own goal
+                    is_own_goal = "og" in raw_goal_texts[idx] if idx < len(raw_goal_texts) else False
+
+                    # Assign classifications
+                    if is_penalty:
+                        goal_time += " - P"  # Penalty Goal
+                    elif is_own_goal:
+                        goal_time += " - O"  # Own Goal
+                    else:
+                        goal_time += " - S"  # Standard Goal
+
+                    goal_times.append(goal_time)
+
+                if player_name not in goals_data:
+                    goals_data[player_name] = []
+
+                goals_data[player_name].extend(goal_times)
+
+        logging.info(f"Extracted goal data: {goals_data}")
+        return goals_data
+
+    except Exception as e:
+        logging.error(f"Error in extract_goal_events: {e}")
+        return {}
+
+
+
+
+
+
+
+
 
 def extract_goal_events(soup, event_type_class):
     logging.info("Entering function: extract_goal_events")
@@ -369,7 +451,7 @@ def generate_player_dictionaries(soup):
         HomeTeamProcessed = process_sub_data(HomeTeamStarters, HomeFullTeamUnprocessed)
         AwayTeamProcessed = process_sub_data(AwayTeamStarters, AwayFullTeamUnprocessed)
 
-        HomeGoals = extract_goal_events(soup, 'KeyEventsHome')
+        HomeGoals = extract_goal_events_v2(soup, 'KeyEventsHome')
         print (HomeGoals)
         HomeAssists = extract_players_and_assists(soup, ".*GroupedHomeEvent e1ojeme81*")
         for player in HomeGoals:
@@ -387,7 +469,7 @@ def generate_player_dictionaries(soup):
             else:
                 logging.warning(f"Assist provider {player} not found in HomeTeamProcessed.")
 
-        AwayGoals = extract_goal_events1(soup, 'KeyEventsAway')
+        AwayGoals = extract_goal_events_v2(soup, 'KeyEventsAway')
         AwayAssists = extract_players_and_assists(soup, ".*GroupedAwayEvent e1ojeme80*")
         print(AwayGoals)
         for player in AwayGoals:
