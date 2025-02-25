@@ -9,7 +9,7 @@ logger = logging.getLogger()
 Actions = ['Return_One_Match_Save_To_File', 'NightUpdate', 'DeleteListOfIds', 'ReturnGane']
 # Local testing
 if __name__ == "__main__":
-    Action = 'Return_One_Match_Save_To_File'
+    Action = 'Flood_S3'
     if Action == 'Return_One_Match_Save_To_File':
         ## Testing Of Edge Cases
         pens = "https://www.bbc.co.uk/sport/football/live/cew5w91gy74t"

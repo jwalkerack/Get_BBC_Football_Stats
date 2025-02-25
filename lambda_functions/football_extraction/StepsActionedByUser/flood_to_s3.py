@@ -23,7 +23,7 @@ def lambda_handler_flood(event, context):
     """Flood AWS Lambda handler."""
     reset_match_id_json()
     delete_all_json_files()
-    monthsToProcess = get_flood_months(monthsOfInterestToFeb)
+    monthsToProcess = get_flood_months(monthsOfInterest)
     process_games_for_months_TD(monthsToProcess, leagues)
     return {
         "statusCode": 200,

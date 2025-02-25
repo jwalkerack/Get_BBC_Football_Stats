@@ -31,3 +31,6 @@ SUMMARY
 - Stores data in JSON format on Amazon S3.
 - Automates workflows using AWS Lambda.
 - Provides user-driven scripts for data validation and testing.
+
+Next Part of the Process is Snowflake set up with repo
+Stored here https://github.com/jwalkerack/snow_setup_football
