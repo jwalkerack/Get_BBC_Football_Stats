@@ -125,9 +125,18 @@ def swap_subs_to_starter(subList):
         logging.error(f"Error in swap_subs_to_starter: {e}")
         return subList
 
+
+
+
+import re
+import logging
+from bs4 import BeautifulSoup
+
+
 def extract_players_and_assists(soup, searchString):
     logging.info("Entering function: extract_players_and_assists")
     try:
+        # Using regex properly to match dynamic classes
         container = soup.find('div', class_=re.compile(searchString))
         if not container:
             logging.warning("No container found for player assists.")
@@ -135,27 +144,34 @@ def extract_players_and_assists(soup, searchString):
 
         player_data = {}
         spans = container.find_all('span', class_='visually-hidden')
+
+        # Remove first span (team name) if it exists
         if spans:
             spans[0].extract()
 
         text = container.get_text(strip=True)
-        entries = text.split(',')
 
-        for entry in entries:
-            if '(' in entry and ')' in entry:
-                player_info, time_info = entry.split('(', 1)
-                player_name = clean_text(player_info.strip())
-                assist_time = time_info.strip(')').strip()
+        # Regex pattern to extract player name and assist times
+        pattern = r"([\w\s\.\-]+)\s*\(([^)]+)\)"
+        matches = re.findall(pattern, text)
 
-                if player_name not in player_data:
-                    player_data[player_name] = []
+        for player_name, times in matches:
+            player_name = player_name.strip()
+            assist_times = [t.strip() for t in times.split(',')]
 
-                player_data[player_name].append(assist_time)
+            if player_name not in player_data:
+                player_data[player_name] = []
+
+            player_data[player_name].extend(assist_times)
 
         return player_data
+
     except Exception as e:
         logging.error(f"Error in extract_players_and_assists: {e}")
         return {}
+
+
+
 
 import logging
 import re
